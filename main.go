@@ -1,7 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/prakashdumbre-toast/304/game"
+)
 
 func main() {
-	fmt.Println("Hello World!")
+	fmt.Println("Welcome to My 304 Server!")
+	game.NewGame()
+	fmt.Println("That's all for now!!")
 }
