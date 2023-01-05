@@ -7,63 +7,87 @@ import (
 )
 
 type Game struct {
-	Deck    *Deck.Deck
-	Players []*player.Player
-	Hands   []Hand
-	Risker  *player.Player
-	Partner *player.Player
-	Target  int
+	Deck      *Deck.Deck
+	Players   []player.Player
+	Tricks    []Trick
+	Risker    *player.Player
+	Partner   *player.Player
+	GameCards []Deck.Card
+	Target    int
 }
 
-type Hand struct {
-	Cards  []Deck.Card
-	Winner *player.Player
+var G = Game{
+	Players: createPlayers(),
 }
 
 func NewGame() {
 
-	G := Game{}
+	// Assign Defaults
+	G.Risker = &G.Players[0]
+	G.Partner = &G.Players[2]
 
 	//	Create a Deck for the Game
 	fmt.Println("Creating Deck")
-	Deck := Deck.NewDeck()
-	G.Deck = &Deck
-
-	fmt.Println("Initiating Players")
-	G.CreatePlayersAndAssignDefault()
+	D := Deck.NewDeck()
+	G.Deck = &D
 
 	//	Deal 4 Cards to Each Player
-	fmt.Println("Dealing 4 Cards to each Player")
-	G.DealRound()
+	G.GameCards = append(G.GameCards, G.Deck.Draw(16)...)
+	G.DealRound1()
 
 	// Round 1 of betting
 	G.Round1Betting()
 
 	//	Select Partner
 	G.SelectPartner()
+
+	//	Deal remaining 4 cards to each player
+	G.GameCards = append(G.GameCards, G.Deck.Draw(16)...)
+	G.DealRound2()
+
+	fmt.Println("After Dealing Round 2, players are as follow-")
+	for _, p := range G.Players {
+		fmt.Println("")
+		fmt.Printf("Name : %s", p.Name)
+		fmt.Printf("Cards : %v", p.HoldingCards)
+		fmt.Println("--------------------------------")
+	}
+
+	fmt.Println("GameCards : ", G.GameCards)
+	//	Collect Tricks
+	G.CollectTricks()
+
 }
 
-func (G Game) CreatePlayersAndAssignDefault() {
+func createPlayers() []player.Player {
 	//	Create 4 Players TODO: Move to init()
 	fmt.Println("Creating 4 Players with P1 as Default")
-	P1 := player.Player{Name: "Alpha"}
-	P2 := player.Player{Name: "Bravo"}
-	P3 := player.Player{Name: "Charlie"}
-	P4 := player.Player{Name: "Delta"}
+	Players := []player.Player{
+		{
+			Name:         "Alpha",
+			HoldingCards: []*Deck.Card{},
+		},
+		{
+			Name:         "Bravo",
+			HoldingCards: []*Deck.Card{},
+		},
+		{
+			Name:         "Charlie",
+			HoldingCards: []*Deck.Card{},
+		},
+		{
+			Name:         "Delta",
+			HoldingCards: []*Deck.Card{},
+		},
+	}
 
-	G.Players = []*player.Player{&P1, &P2, &P3, &P4}
-
-	// TODO : Create logic to keep track of defaults
-	G.Risker = &P1
-	G.Target = 180
+	return Players
 }
 
-func (G Game) Round1Betting() {
+func (G *Game) Round1Betting() {
 	//TODO
 }
 
-func (G Game) SelectPartner() {
+func (G *Game) SelectPartner() {
 	//TODO: Create logic to set partner
-	partner := *G.Players[2]
-	G.Partner = &partner
 }

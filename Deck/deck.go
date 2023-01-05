@@ -2,6 +2,7 @@ package Deck
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -23,8 +24,9 @@ func NewDeck() Deck {
 	GameDeck := Deck{}
 
 	baseURL := "http://localhost:8080/api/"
-	endpoint := "deck/new/shuffle/?deck_count=1"
-	url := baseURL + endpoint
+	endpoint := "deck/new/shuffle/"
+	param := "?cards=JS,9S,KS,QS,AS,0S,7S,8S,JD,9D,KD,QD,AD,0D,7D,8D,JC,9C,KC,QC,AC,0C,7C,8C,JH,9H,KH,QH,AH,0H,7H,8H"
+	url := baseURL + endpoint + param
 
 	DoCClient := http.Client{Timeout: time.Second * 2}
 
@@ -55,9 +57,12 @@ func NewDeck() Deck {
 	return GameDeck
 }
 
-func (d *Deck) Draw() Card {
+func (d *Deck) Draw(c int) []Card {
+	if c == 0 {
+		c = 1
+	}
 	baseURL := "http://localhost:8080/api/"
-	endpoint := "deck/" + d.DeckId + "/draw/?count=1"
+	endpoint := fmt.Sprintf("deck/%s/draw/?count=%d", d.DeckId, c)
 	url := baseURL + endpoint
 
 	DoCClient := http.Client{Timeout: time.Second * 2}
@@ -93,5 +98,5 @@ func (d *Deck) Draw() Card {
 	}
 
 	d.RemainingCards = DrawnCard.RemainingCards
-	return DrawnCard.Cards[0]
+	return DrawnCard.Cards
 }
